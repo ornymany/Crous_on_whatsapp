@@ -20,7 +20,17 @@ export function getClient(): Client {
             puppeteer: {
                 headless: true,
                 executablePath: getBrowserPath(),
-                args: ['--no-sandbox', '--disable-setuid-sandbox'],
+                args: [
+                    '--no-sandbox',
+                    '--disable-setuid-sandbox',
+                    '--disable-dev-shm-usage',
+                    '--disable-gpu',
+                    '--disable-extensions',
+                    '--no-first-run',
+                    '--no-zygote',
+                    '--single-process',
+                ],
+                timeout: 90000,
             },
         });
 
