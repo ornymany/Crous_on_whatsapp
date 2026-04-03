@@ -14,61 +14,80 @@ function getBrowserPath(): string {
     return '/usr/bin/google-chrome-stable';
 }
 
-export function getClient(): Client {
-    if (!client) {
-        client = new Client({
-            authStrategy: new LocalAuth(),
-            puppeteer: {
-                headless: true,
-                executablePath: getBrowserPath(),
-                args: [
-                    '--no-sandbox',
-                    '--disable-setuid-sandbox',
-                    '--disable-dev-shm-usage',
-                    '--disable-gpu',
-                    '--disable-extensions',
-                    '--no-first-run',
-                ],
-                timeout: 90000,
-            },
-        });
+function createClient(): Client {
+    client = new Client({
+        authStrategy: new LocalAuth(),
+        puppeteer: {
+            headless: true,
+            executablePath: getBrowserPath(),
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage',
+                '--disable-gpu',
+                '--disable-extensions',
+                '--no-first-run',
+            ],
+            timeout: 90000,
+        },
+    });
 
-        client.on('qr', (qr) => {
-            console.log('📱 Scanne ce QR code avec WhatsApp :');
-            qrcode.generate(qr, { small: true });
-            fs.writeFileSync('/tmp/whatsapp-qr.txt', qr);
-            console.log(`🔗 QR data saved to /tmp/whatsapp-qr.txt`);
-            console.log(`🔗 RAW QR STRING: ${qr}`);
-        });
+    client.on('qr', (qr) => {
+        console.log('📱 Scanne ce QR code avec WhatsApp :');
+        qrcode.generate(qr, { small: true });
+        fs.writeFileSync('/tmp/whatsapp-qr.txt', qr);
+        console.log(`🔗 QR data saved to /tmp/whatsapp-qr.txt`);
+        console.log(`🔗 RAW QR STRING: ${qr}`);
+    });
 
-        client.on('authenticated', () => {
-            console.log('✅ Authentification réussie');
-        });
+    client.on('authenticated', () => {
+        console.log('✅ Authentification réussie');
+    });
 
-        client.on('auth_failure', (msg) => {
-            console.error('❌ Échec d\'authentification :', msg);
-        });
+    client.on('auth_failure', (msg) => {
+        console.error('❌ Échec d\'authentification :', msg);
+    });
 
-        client.on('disconnected', (reason) => {
-            console.warn('⚠️ Déconnecté :', reason);
-        });
-    }
+    client.on('disconnected', (reason) => {
+        console.warn('⚠️ Déconnecté :', reason);
+    });
+
     return client;
 }
 
+export function getClient(): Client {
+    if (!client) createClient();
+    return client;
+}
+
+const MAX_RETRIES = 3;
+
 export async function initWhatsApp(): Promise<void> {
-    const wa = getClient();
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+        try {
+            const wa = createClient();
+            await new Promise<void>((resolve, reject) => {
+                wa.on('ready', () => {
+                    console.log('✅ WhatsApp client prêt');
+                    groupChatId = config.groupId;
+                    console.log(`📌 Groupe cible : ${groupChatId}`);
+                    resolve();
+                });
 
-    return new Promise((resolve) => {
-        wa.on('ready', () => {
-            console.log('✅ WhatsApp client prêt');
-            groupChatId = config.groupId;
-            console.log(`📌 Groupe cible : ${groupChatId}`);
-            resolve();
-        });
-
-        wa.initialize();
-    });
+                wa.initialize().catch(reject);
+            });
+            return;
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            console.error(`⚠️ Tentative ${attempt}/${MAX_RETRIES} échouée : ${msg}`);
+            try { await client?.destroy(); } catch {}
+            client = undefined!;
+            if (attempt === MAX_RETRIES) throw err;
+            const delay = attempt * 5000;
+            console.log(`⏳ Nouvelle tentative dans ${delay / 1000}s...`);
+            await new Promise(r => setTimeout(r, delay));
+        }
+    }
 }
 
 export async function sendToGroup(message: string): Promise<boolean> {
