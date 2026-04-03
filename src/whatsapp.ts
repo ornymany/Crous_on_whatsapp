@@ -27,8 +27,14 @@ function createClient(): Client {
                 '--disable-gpu',
                 '--disable-extensions',
                 '--no-first-run',
+                '--disable-background-networking',
+                '--disable-default-apps',
+                '--disable-translate',
+                '--disable-sync',
+                '--metrics-recording-only',
+                '--js-flags=--max-old-space-size=256',
             ],
-            timeout: 90000,
+            timeout: 120000,
         },
     });
 
