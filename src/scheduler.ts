@@ -12,7 +12,8 @@ async function sendDailyMenu(): Promise<void> {
         const message = formatMenus(menus);
 
         if (!message) {
-            console.log('ℹ️ Aucun menu disponible aujourd\'hui, aucun message envoyé');
+            console.log('ℹ️ Aucun menu disponible aujourd\'hui, envoi d\'un message de fermeture');
+            await sendToGroup('🔒 Le restaurant universitaire est fermé aujourd\'hui.');
             return;
         }
 
