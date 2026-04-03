@@ -1,9 +1,17 @@
 import { Client, LocalAuth } from 'whatsapp-web.js';
 import qrcode from 'qrcode-terminal';
+import os from 'os';
 import { config } from './config';
 
 let client: Client;
 let groupChatId: string | null = null;
+
+function getBrowserPath(): string {
+    if (os.platform() === 'win32') {
+        return String.raw`C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe`;
+    }
+    return '/usr/bin/chromium-browser';
+}
 
 export function getClient(): Client {
     if (!client) {
@@ -11,7 +19,7 @@ export function getClient(): Client {
             authStrategy: new LocalAuth(),
             puppeteer: {
                 headless: true,
-                executablePath: String.raw`C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe`,
+                executablePath: getBrowserPath(),
                 args: ['--no-sandbox', '--disable-setuid-sandbox'],
             },
         });

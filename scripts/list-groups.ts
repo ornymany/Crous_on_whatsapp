@@ -1,10 +1,18 @@
 import { Client, LocalAuth } from 'whatsapp-web.js';
+import os from 'os';
+
+function getBrowserPath(): string {
+    if (os.platform() === 'win32') {
+        return String.raw`C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe`;
+    }
+    return '/usr/bin/chromium-browser';
+}
 
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
         headless: true,
-        executablePath: String.raw`C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe`,
+        executablePath: getBrowserPath(),
         args: ['--no-sandbox', '--disable-setuid-sandbox'],
     },
 });
