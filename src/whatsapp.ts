@@ -1,6 +1,7 @@
 import { Client, LocalAuth } from 'whatsapp-web.js';
 import qrcode from 'qrcode-terminal';
 import os from 'os';
+import fs from 'fs';
 import { config } from './config';
 
 let client: Client;
@@ -35,6 +36,9 @@ export function getClient(): Client {
         client.on('qr', (qr) => {
             console.log('📱 Scanne ce QR code avec WhatsApp :');
             qrcode.generate(qr, { small: true });
+            fs.writeFileSync('/tmp/whatsapp-qr.txt', qr);
+            console.log(`🔗 QR data saved to /tmp/whatsapp-qr.txt`);
+            console.log(`🔗 RAW QR STRING: ${qr}`);
         });
 
         client.on('authenticated', () => {
