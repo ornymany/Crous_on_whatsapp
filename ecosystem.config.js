@@ -2,8 +2,9 @@ module.exports = {
     apps: [
         {
             name: 'crous-whatsapp',
-            script: 'dist/index.js',
-            cwd: __dirname,
+            interpreter: '/home/ubuntu/.bun/bin/bun',
+            script: 'src/index.ts',
+            cwd: '/home/ubuntu/Crous_on_whatsapp',
             env: {
                 NODE_ENV: 'production',
             },
