@@ -103,8 +103,10 @@ export async function sendToGroup(message: string): Promise<boolean> {
     }
 
     try {
-        await getClient().sendMessage(groupChatId, message);
-        console.log('✅ Message envoyé au groupe');
+        const chat = await getClient().getChatById(groupChatId);
+        console.log(`📍 Chat trouvé : "${chat.name}" (isGroup: ${chat.isGroup})`);
+        const msg = await getClient().sendMessage(groupChatId, message);
+        console.log(`✅ Message envoyé au groupe (id: ${msg?.id?.id ?? 'inconnu'})`);
         return true;
     } catch (err) {
         console.error('❌ Erreur envoi message :', err instanceof Error ? err.message : err);
