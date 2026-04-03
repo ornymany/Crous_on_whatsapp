@@ -6,11 +6,22 @@ Bot Node.js/TypeScript qui scrape le menu du jour du **Resto U L'Amazone** (CROU
 
 ## Contexte
 
-- **Restaurant** : [Resto U L'Amazone](https://www.crous-bordeaux.fr/restaurant/resto-u-n1-ferme-pour-travaux-2/) — Avenue Prévost, Talence — ouvert 11h45-13h45 du lundi au vendredi
-- **Groupe WhatsApp** : [Lien d'invitation](https://chat.whatsapp.com/HGhk3PrZZU64RWKdCfHKUv)
-- **Objectif** : recevoir le menu du midi sur le groupe WhatsApp sans avoir à aller chercher l'info manuellement
+A REALISER :
 
----
+1) bun i
+
+2) créer un fichier .env selon vos informations :
+
+CROUS_URL=[l'URL de votre CROUS]
+
+GROUP_NAME=[Nom du groupe WhatsApp ATTENTION il ne doit donc pas changer]
+
+WHATSAPP_GROUP_INVITE=[créer un lien d'invitation whatsapp et ne mettre que ce qu'il y a après https://chat.whatsapp.com/]
+
+CRON_SCHEDULE=0 11 * * 1-5      #s'active à 11H tous les jours ouvrés
+
+TZ=Europe/Paris
+
 
 ## Stack technique
 
