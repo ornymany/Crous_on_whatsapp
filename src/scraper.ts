@@ -12,13 +12,14 @@ export interface FoodCategory {
 }
 
 export interface DayMenu {
+    restaurantName: string;
     date: string;
     mealTitle: string;
     categories: FoodCategory[];
 }
 
-export async function scrapeTodayMenu(): Promise<DayMenu | null> {
-    const { data: html } = await axios.get(config.crousUrl);
+async function scrapeSingleUrl(url: string): Promise<DayMenu | null> {
+    const { data: html } = await axios.get(url);
     const $ = cheerio.load(html);
 
     const today = new Date();
@@ -31,6 +32,7 @@ export async function scrapeTodayMenu(): Promise<DayMenu | null> {
         'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre',
     ];
 
+    const restaurantName = $('h1.post_title').first().text().trim() || url;
     let todayMenu: DayMenu | null = null;
 
     $('section.menus > div.menu').each((_, menuEl) => {
@@ -64,14 +66,30 @@ export async function scrapeTodayMenu(): Promise<DayMenu | null> {
                 }
             });
 
-            if (categoryName) {
+            if (categoryName && !categoryName.toLowerCase().includes('crous market')) {
                 categories.push({ name: categoryName, dishes });
             }
         });
 
-        todayMenu = { date: dateText, mealTitle, categories };
+        todayMenu = { restaurantName, date: dateText, mealTitle, categories };
         return false; // break
     });
 
     return todayMenu;
+}
+
+export async function scrapeTodayMenus(): Promise<DayMenu[]> {
+    const results = await Promise.allSettled(
+        config.crousUrls.map((url) => scrapeSingleUrl(url))
+    );
+
+    const menus: DayMenu[] = [];
+    for (const result of results) {
+        if (result.status === 'fulfilled' && result.value) {
+            menus.push(result.value);
+        } else if (result.status === 'rejected') {
+            console.error('❌ Erreur scraping :', result.reason);
+        }
+    }
+    return menus;
 }

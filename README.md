@@ -12,9 +12,13 @@ A REALISER :
 
 2) créer un fichier .env selon vos informations :
 
-CROUS_URL=[l'URL de votre CROUS]
+CROUS_URL_1=[l'URL de votre CROUS]
 
-GROUP_NAME=[Nom du groupe WhatsApp ATTENTION il ne doit donc pas changer]
+CROUS_URL_2=[l'URL de votre CROUS]
+
+CROUS_URL_3=[l'URL de votre CROUS]
+
+GROUP_NAME=[Lancer "bun scripts/list-groups.ts et copier l'id (qui ressemble à 1738346@g.us) du groupe dans lequel vous voulez ajouter les messages"]
 
 WHATSAPP_GROUP_INVITE=[créer un lien d'invitation whatsapp et ne mettre que ce qu'il y a après https://chat.whatsapp.com/]
 

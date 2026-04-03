@@ -9,9 +9,22 @@ function requireEnv(name: string): string {
     return value;
 }
 
+function loadCrousUrls(): string[] {
+    const urls: string[] = [];
+    let i = 1;
+    while (process.env[`CROUS_URL_${i}`]) {
+        urls.push(process.env[`CROUS_URL_${i}`]!);
+        i++;
+    }
+    if (urls.length === 0) {
+        throw new Error('Aucune CROUS_URL_n trouvée dans le .env');
+    }
+    return urls;
+}
+
 export const config = {
-    crousUrl: requireEnv('CROUS_URL'),
-    groupName: requireEnv('GROUP_NAME'),
+    crousUrls: loadCrousUrls(),
+    groupId: requireEnv('GROUP_NAME'),
     whatsappGroupInvite: requireEnv('WHATSAPP_GROUP_INVITE'),
     cronSchedule: requireEnv('CRON_SCHEDULE'),
     tz: process.env.TZ || 'Europe/Paris',
