@@ -27,8 +27,6 @@ export function getClient(): Client {
                     '--disable-gpu',
                     '--disable-extensions',
                     '--no-first-run',
-                    '--no-zygote',
-                    '--single-process',
                 ],
                 timeout: 90000,
             },
